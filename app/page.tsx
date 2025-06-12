@@ -46,7 +46,7 @@ interface User {
 export default function AccessManagement() {
   const { currentUser, logout } = useAuth()
   const { applications, setApplications, getApplicationReminder, refreshData, addApplication: addApplicationFromHook } = useData()
-  // Removed duplicate useState declaration for applications and setApplications
+  // Removed duplicate useState declarations for applications and setApplications
   const [selectedApp, setSelectedApp] = useState<Application | null>(null)
   const [showAddApp, setShowAddApp] = useState(false)
   const [showUserManagement, setShowUserManagement] = useState(false)
@@ -62,17 +62,6 @@ export default function AccessManagement() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [showImportExport, setShowImportExport] = useState(false)
 
-  // Fetch applications on component mount (This is now handled by the useData hook's useEffect)
-  // useEffect(() => {
-  //   const fetchApplications = async () => {
-  //     const res = await fetch('/api/applications');
-  //     const data = await res.json();
-  //     setApplications(data);
-  //   };
-  //   fetchApplications();
-  // }, []);
-
-
   const isAdmin = currentUser?.role === "admin"
 
   const addApplication = async () => {
@@ -81,11 +70,12 @@ export default function AccessManagement() {
       return;
     }
 
-    try {
-      //const newApp = await addApplication({ name: newAppName.trim(), description: newAppDescription.trim() });
-      const newApp = await addApplicationFromHook({ name: newAppName.trim(), description: newAppDescription.trim() });
+    // Instead of making an API call, display an alert with the data
+    alert(`Add Application:\nName: ${newAppName.trim()}\nDescription: ${newAppDescription.trim()}`);
 
-      // The setApplications and setShowAddApp is handled within the addApplication function in useData
+    // Clear the form and close the dialog
+    setNewAppName("");
+    setNewAppDescription("");
       clearAddUserForm(); // Clear the add application form
     } catch (error) {
       console.error("Error adding application:", error);

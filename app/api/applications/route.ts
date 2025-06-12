@@ -107,70 +107,70 @@ export async function GET(request: NextRequest) {
   }
 }
 
-export async function POST(request: NextRequest) {
-  try {
-    const token = request.cookies.get('session_token')?.value
-    const session = token ? await getSessionFromCookie(token) : null;
-    if (!session) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-    }
+// export async function POST(request: NextRequest) {
+//   try {
+//     const token = request.cookies.get('session_token')?.value
+//     const session = token ? await getSessionFromCookie(token) : null;
+//     if (!session) {
+//       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+//     }
 
-    if (session.user.role !== "admin") {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 })
-    }
+//     if (session.user.role !== "admin") {
+//       return NextResponse.json({ error: "Forbidden" }, { status: 403 })
+//     }
 
-    const { name, description } = await request.json()
+//     const { name, description } = await request.json()
 
-    if (!name) {
-      return NextResponse.json({ error: "Application name is required" }, { status: 400 })
-    }
+//     if (!name) {
+//       return NextResponse.json({ error: "Application name is required" }, { status: 400 })
+//     }
 
-    // Insert application
-    const result = await query<any>(
-      `
-      INSERT INTO applications (name, description)
-      VALUES (?, ?)
-    `,
-      [name, description || ""],
-    )
+//     // Insert application
+//     const result = await query<any>(
+//       `
+//       INSERT INTO applications (name, description)
+//       VALUES (?, ?)
+//     `,
+//       [name, description || ""],
+//     )
 
-    const applicationId = result.insertId
+//     const applicationId = result.insertId
 
-    // Add current user as admin
-    await query(
-      `
-      INSERT INTO application_users (application_id, user_id, is_admin)
-      VALUES (?, ?, TRUE)
-    `,
-      [applicationId, session.user.id],
-    )
+//     // Add current user as admin
+//     await query(
+//       `
+//       INSERT INTO application_users (application_id, user_id, is_admin)
+//       VALUES (?, ?, TRUE)
+//     `,
+//       [applicationId, session.user.id],
+//     )
 
 
 
-    // Fetch the newly created application with its users and reminder status
-    const newApp = await query<any[]>(`
-      SELECT a.*, 
-        (SELECT COUNT(*) FROM application_users WHERE application_id = a.id) as user_count,
-        (SELECT COUNT(*) FROM application_users WHERE application_id = a.id AND is_admin = TRUE) as admin_count
-      FROM applications a
-      WHERE a.id = ?
-    `, [applicationId]);
+//     // Fetch the newly created application with its users and reminder status
+//     const newApp = await query<any[]>(`
+//       SELECT a.*,
+//         (SELECT COUNT(*) FROM application_users WHERE application_id = a.id) as user_count,
+//         (SELECT COUNT(*) FROM application_users WHERE application_id = a.id AND is_admin = TRUE) as admin_count
+//       FROM applications a
+//       WHERE a.id = ?
+//     `, [applicationId]);
 
-    if (newApp.length === 0) {
-      return NextResponse.json({ error: "Failed to fetch created application" }, { status: 500 });
-    }
+//     if (newApp.length === 0) {
+//       return NextResponse.json({ error: "Failed to fetch created application" }, { status: 500 });
+//     }
 
-    // Attach user information to the new app object (since the user was just added)
-    newApp[0].users = [{ id: session.user.id, name: session.user.username, email: session.user.email, isAdmin: true }];
-    newApp[0].reminder = null; // No reminder initially
- newApp[0].users = newApp[0].users || [];
+//     // Attach user information to the new app object (since the user was just added)
+//     newApp[0].users = [{ id: session.user.id, name: session.user.username, email: session.user.email, isAdmin: true }];
+//     newApp[0].reminder = null; // No reminder initially
+//  newApp[0].users = newApp[0].users || [];
 
-    return NextResponse.json({
- message: "Application created successfully",
- application: newApp[0]
-    })
-  } catch (error) {
-    console.error("Error creating application:", error)
-    return NextResponse.json({ error: "Failed to create application" }, { status: 500 })
-  }
-}
+//     return NextResponse.json({
+//  message: "Application created successfully",
+//  application: newApp[0]
+//     })
+//   } catch (error) {
+//     console.error("Error creating application:", error)
+//     return NextResponse.json({ error: "Failed to create application" }, { status: 500 })
+//   }
+// }
