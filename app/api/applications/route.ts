@@ -70,6 +70,7 @@ export async function GET(request: NextRequest) {
         WHERE r.application_id = ? AND r.is_active = TRUE
         LIMIT 1
       `,
+ [app.id] // Pass the application ID as a parameter
       )
 
       if (reminders.length > 0) {
@@ -124,29 +125,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Application name is required" }, { status: 400 })
     }
 
-
-    // Fetch the newly created application with its users and reminder status
-    const newApp = await query<any[]>(`
-      SELECT a.*, 
-        (SELECT COUNT(*) FROM application_users WHERE application_id = a.id) as user_count,
-        (SELECT COUNT(*) FROM application_users WHERE application_id = a.id AND is_admin = TRUE) as admin_count
-      FROM applications a
-      WHERE a.id = ?
-    `, [applicationId]);
-
-    if (newApp.length === 0) {
-      return NextResponse.json({ error: "Failed to fetch created application" }, { status: 500 });
-    }
-
-    // Attach user information to the new app object (since the user was just added)
-    newApp[0].users = [{ id: session.user.id, name: session.user.username, email: session.user.email, isAdmin: true }];
-    newApp[0].reminder = null; // No reminder initially
-
-    return NextResponse.json({
- message: "Application created successfully",
- application: newApp[0]
-    })
-  } catch (error) {
     // Insert application
     const result = await query<any>(
       `
@@ -166,6 +144,32 @@ export async function POST(request: NextRequest) {
     `,
       [applicationId, session.user.id],
     )
+
+
+
+    // Fetch the newly created application with its users and reminder status
+    const newApp = await query<any[]>(`
+      SELECT a.*, 
+        (SELECT COUNT(*) FROM application_users WHERE application_id = a.id) as user_count,
+        (SELECT COUNT(*) FROM application_users WHERE application_id = a.id AND is_admin = TRUE) as admin_count
+      FROM applications a
+      WHERE a.id = ?
+    `, [applicationId]);
+
+    if (newApp.length === 0) {
+      return NextResponse.json({ error: "Failed to fetch created application" }, { status: 500 });
+    }
+
+    // Attach user information to the new app object (since the user was just added)
+    newApp[0].users = [{ id: session.user.id, name: session.user.username, email: session.user.email, isAdmin: true }];
+    newApp[0].reminder = null; // No reminder initially
+ newApp[0].users = newApp[0].users || [];
+
+    return NextResponse.json({
+ message: "Application created successfully",
+ application: newApp[0]
+    })
+  } catch (error) {
     console.error("Error creating application:", error)
     return NextResponse.json({ error: "Failed to create application" }, { status: 500 })
   }
