@@ -76,7 +76,6 @@ export default function AccessManagement() {
     // Clear the form and close the dialog
     setNewAppName("");
     setNewAppDescription("");
-      clearAddUserForm(); // Clear the add application form
     } catch (error) {
       console.error("Error adding application:", error);
       alert("Error adding application. Please try again.");
