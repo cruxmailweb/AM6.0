@@ -522,7 +522,7 @@ export default function AccessManagement() {
                         <div className="flex items-center gap-2 text-sm text-gray-600">
                           <Users className="w-4 h-4" />
                           <span>{app.users.length} users</span>
-                        </div>
+                          <span>{app.users?.length ?? 0} users</span>
                         <div className="flex gap-1">
                           {app.users.filter((user: User) => user.isAdmin).length > 0 && (
                             <Badge variant="secondary" className="text-xs">
@@ -577,8 +577,8 @@ export default function AccessManagement() {
                             onClick={() => openUserManagement(app)}
                           >
                             {app.description}
-                          </TableCell>
-                          <TableCell className="text-center">{app.users.length}</TableCell>
+                         </TableCell>
+                          <TableCell className="text-center">{app.users?.length ?? 0}</TableCell>
                           <TableCell>{app.users.filter((user: User) => user.isAdmin).length}</TableCell>
                           <TableCell>
                             {reminderStatus ? (
