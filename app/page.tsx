@@ -366,9 +366,8 @@ export default function AccessManagement() {
 
 
   return (
-    <ProtectedRoute>
-      <div className="min-h-screen bg-white">
-        {/* Header */}
+    /* UNIQUE_COMMENT_TEST */
+    <div className="min-h-screen bg-white">
         <div className="border-b bg-white">
           <div className="max-w-7xl mx-auto px-6 py-4">
             <div className="flex items-center justify-between">
@@ -521,7 +520,6 @@ export default function AccessManagement() {
                       <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center gap-2 text-sm text-gray-600">
                           <Users className="w-4 h-4" />
-                          <span>{app.users.length} users</span>
                           <span>{app.users?.length ?? 0} users</span>
                         <div className="flex gap-1">
                           {app.users.filter((user: User) => user.isAdmin).length > 0 && (
@@ -815,6 +813,5 @@ export default function AccessManagement() {
           </AlertDialogContent>
         </AlertDialog>
       </div>
-    </ProtectedRoute>
   )
 }
